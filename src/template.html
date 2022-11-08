@@ -56,10 +56,15 @@
       </div>
       <div class="right-part">
         <div class="section-title">Inbox</div>
-        <button class="add">
+        <button class="add" data-active="true">
           <i class="fa-solid fa-plus"></i>
           <div>Add Task</div>
         </button>
+        <div class="new-task">
+          <input type="text" />
+          <button class="add-task">Add</button>
+          <button class="cancel-task">Cancel</button>
+        </div>
       </div>
     </main>
     <footer>
@@ -68,5 +73,39 @@
         <i class="fa-brands fa-github"></i>
       </a>
     </footer>
+    <div class="add-project-popup" data-active="false">
+      <div class="cross">
+        <button>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form action="#">
+        <div class="prj-name">
+          <label for="project-name">Enter your project name: </label>
+          <input type="text" required id="project-name" />
+        </div>
+        <div class="prior">
+          <label for="priority">Choose project's priority:</label>
+          <select id="priority" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <br />
+        <div class="descr">
+          <label for="description">Enter project description: </label>
+          <textarea id="description" cols="30" rows="10"></textarea>
+        </div>
+        <div class="date">
+          <label for="duedate">Choose the due date:</label>
+          <input type="date" id="duedate" required />
+        </div>
+        <div class="buttons">
+          <button type="submit">Submit</button>
+          <button type="reset">Cancel</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>

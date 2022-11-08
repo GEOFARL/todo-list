@@ -14,6 +14,8 @@ body {
     --hover-pink: #fecdd3;
     --light-pink: #fff1f2;
     --white: #ffffff;
+    --grey: rgb(240, 238, 238);
+    --black: #000;
     --white-hover: rgb(216, 216, 216);
 }
 
@@ -94,6 +96,49 @@ main {
             font-weight: 700;
             padding-left: 5px;
         }
+        .add[data-active="false"] {
+            display: none;
+        }
+        .new-task {
+            display: none;
+            width: 100%;
+            margin-top: 20px;
+            input {
+                width: 100%;
+                height: 40px;
+                border-radius: 5px;
+                border: 1px solid var(--darkest-pink);
+                outline: none;
+                padding: 5px;
+                font-size: 1.2rem;
+            }
+            button {
+                width: 48.5%;
+                margin-top: 10px;
+                font-size: 1rem;
+                font-weight: bold;
+                height: 40px;
+                border-radius: 3px;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+            .add-task {
+                margin-right: 2%;
+                background-color: #aaffaa;
+                border: 1px solid #99dd99;
+                &:hover {
+                    background-color: #a6f0a6;
+                }
+            }
+            .cancel-task {
+                background-color: #ffbebe;
+                border: 1px solid #eeadad;
+                &:hover {
+                    background-color: #f5b2b2;
+                }
+            }
+        }
     }
 }
 
@@ -106,6 +151,17 @@ main {
         grid-template-rows: auto;
         .left-part {
             display: none;
+        }
+    }
+    .add-project-popup {
+        width: 350px !important;
+        padding: 20px !important;
+        font-size: 1.1rem !important;
+        .prj-name input, .date input {
+            margin: 10px 0 0 0 !important;
+        }
+        .date label {
+            padding-right: 5px;
         }
     }
 }
@@ -138,6 +194,7 @@ button.add {
     border: none;
     display: flex;
     gap: 0.5rem;
+    margin-top: 8px;
     align-items: center;
     color: var(--darkest-pink);
     &:hover {
@@ -145,4 +202,140 @@ button.add {
             user-select: none;
             cursor: pointer;
         }
+}
+
+
+.add-project-popup {
+
+    top: 50%;
+    position: fixed;
+    display: none;
+    left: 50%;
+    transform: scale(0);
+    animation: showup 0.5s ease-in-out forwards;
+    width: 600px;
+    padding: 30px;
+    background-color: var(--dark-pink);
+    border-radius: 20px;
+    box-shadow: 0 0 20px 0 black;
+    color: var(--white);
+    input, textarea {
+        outline: 2px solid var(--darkest-pink);
+    }
+    input[type="text"] {
+        width: 200px;
+        height: 30px;
+        border-radius: 15px;
+        border: none;
+        padding: 2px 8px;
+        margin-left: 8px;
+        font-size: 0.9rem;
+        &:focus {
+            background-color: var(--grey);
+            outline: 2px solid var(--black);
+        }
+
+    }
+    div {
+        margin: 15px 0;
+    }
+
+    .prior {
+        select {
+            margin-left: 8px;
+            width: 50px;
+            height: 30px;
+            border-radius: 15px;
+            padding-left: 5px;
+            &:focus {
+                outline: 2px solid var(--black);
+            }
+        }
+    }
+
+    .descr {
+        margin-top: -25px;
+        display: flex;
+        flex-direction: column;
+        label {
+            margin-bottom: 10px;
+        }
+        textarea {
+            resize: none;
+            font-size: 1rem;
+            border-radius: 15px;
+            padding: 10px;
+            font-family: 'Roboto', sans-serif;
+            &:focus {
+                background-color: var(--grey);
+                outline: 2px solid black;
+            }
+        }
+    }
+
+    .date {
+        input {
+            margin-left: 10px;
+            border-radius: 15px;
+            border: none;
+            height: 30px;
+            padding: 0 10px;
+            &:focus {
+                outline: 2px solid var(--black);
+            }
+        }
+    }
+
+    .buttons {
+        display: flex;
+        gap: 20px;
+        button {
+            width: 100px;
+            height: 30px;
+            font-size: 0.9rem;
+            border-radius: 15px;
+            border: none;
+            &:hover {
+                background-color: var(--white-hover);
+                cursor: pointer;
+            }
+        }
+    }
+
+    font-size: 1.3rem;
+
+    @keyframes showup {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    .cross {
+        position: absolute;
+        right: 30px;
+        button {
+            width: 30px;
+            height: 30px;
+            box-sizing: content-box;
+            padding: 3px;
+            background-color: transparent;
+            transition: all .3s ease-in-out;
+            i {
+                font-size: 1.5rem;
+                color: var(--white);
+            }
+            border: 1px solid var(--white);
+            border-radius: 50%;
+            &:hover {
+                background-color: var(--hover-pink);
+                cursor: pointer;
+                i {
+                    color: var(--darkest-pink);
+                }
+            }
+        }
+    }
 }

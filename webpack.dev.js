@@ -31,6 +31,7 @@ module.exports = merge(common, {
             template: "./src/template.html",
         }),
     ],
+    devtool: 'source-map',
     devServer: {
         hot: true,
         static: './dist'
