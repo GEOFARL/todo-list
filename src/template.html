@@ -33,21 +33,39 @@
     <main>
       <div class="left-part">
         <div class="inputs">
-          <div class="inbox elem active">
+          <div class="inbox elem active" data-project-id="1">
             <i class="fa-solid fa-inbox"></i>
             <div>Inbox</div>
           </div>
-          <div class="today elem">
+          <div class="today elem" data-project-id="2">
             <i class="fa-regular fa-calendar"></i>
             <div>Today</div>
           </div>
-          <div class="this-week elem">
+          <div class="this-week elem" data-project-id="3">
             <i class="fa-sharp fa-solid fa-calendar-week"></i>
             <div>This week</div>
           </div>
         </div>
         <div class="projects">
           <div class="name">Projects</div>
+          <div class="inputs">
+            <!-- <div class="bar"></div>
+            <div class="elem">
+              <i class="fa-solid fa-list"></i>
+              <div>prjName1</div>
+              <i class="fa-sharp fa-solid fa-xmark"></i>
+            </div>
+            <div class="elem">
+              <i class="fa-solid fa-list"></i>
+              <div>prjName2</div>
+              <i class="fa-sharp fa-solid fa-xmark"></i>
+            </div>
+            <div class="elem">
+              <i class="fa-solid fa-list"></i>
+              <div>prjName3</div>
+              <i class="fa-sharp fa-solid fa-xmark"></i>
+            </div> -->
+          </div>
           <button class="add">
             <i class="fa-solid fa-plus"></i>
             Add projects
@@ -81,12 +99,14 @@
       </div>
       <form action="#">
         <div class="prj-name">
-          <label for="project-name">Enter your project name: </label>
-          <input type="text" required id="project-name" />
+          <label for="project-name"
+            ><sup>*</sup>Enter your project name:
+          </label>
+          <input type="text" required id="project-name" name="project-name" />
         </div>
         <div class="prior">
-          <label for="priority">Choose project's priority:</label>
-          <select id="priority" required>
+          <label for="priority"><sup>*</sup>Choose project's priority:</label>
+          <select id="priority" required name="priority">
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -98,11 +118,17 @@
           <textarea id="description" cols="30" rows="10"></textarea>
         </div>
         <div class="date">
-          <label for="duedate">Choose the due date:</label>
-          <input type="date" id="duedate" required />
+          <label for="duedate"><sup>*</sup>Choose the due date:</label>
+          <input
+            type="date"
+            id="duedate"
+            min="2022-01-01"
+            required
+            name="dueDate"
+          />
         </div>
         <div class="buttons">
-          <button type="submit">Submit</button>
+          <button type="submit" data-submit-new-project>Submit</button>
           <button type="reset">Cancel</button>
         </div>
       </form>
