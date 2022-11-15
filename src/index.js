@@ -52,10 +52,13 @@ closeNewProjectBtn.addEventListener('click', () => {
     clearPopupField();
 })
 
-function setNewTaskListeners() {
+function setNewTaskListeners(project) {
     const newTaskMenu = document.querySelector('.new-task');
     const addTaskBtn = document.querySelector('.right-part .add');
     const cancelAddNewTaskBtn = newTaskMenu.querySelector('.cancel-task');
+    const submitTaskBtn = document.querySelector('.add-task');
+    const inputNewTask = document.querySelector('.new-task input');
+
     addTaskBtn.addEventListener('click', () => {
         addTaskBtn.setAttribute('data-active', 'false');
         newTaskMenu.style.display = 'block';
@@ -65,9 +68,20 @@ function setNewTaskListeners() {
         addTaskBtn.setAttribute('data-active', 'true');
         newTaskMenu.style.display = 'none';
     })
-}
 
-setNewTaskListeners();
+    submitTaskBtn.addEventListener('click', () => {
+        if (inputNewTask.value !== '') {
+            let index = toDoList.projects.findIndex(project0 => project0.id === project.id);
+            project.addTask(new Task(inputNewTask.value));
+            storage.saveList(toDoList);
+            if (project.id === 2 || project.id === 3)
+                generateRightPageStatic(document.querySelector(`[data-project-id="${project.id}"]`), toDoList.projects[project.id - 1]);
+            else generateRightPageDynamic(document.querySelector(`[data-project-id="${project.id}"]`), toDoList.projects[index]);
+            addTaskBtn.setAttribute('data-active', 'true');
+            newTaskMenu.style.display = 'none';
+        }
+    })
+}
 
 
 function loadPage() {
@@ -84,6 +98,88 @@ function loadPage() {
     })
 }
 
+function appendTask(task, project) {
+    let newTask = document.createElement('div');
+    newTask.classList.add('task');
+    let rightWidth;
+    let paragraph, date;
+    let checked = task.checked === true;
+    if (task.dueDate === 'No date') {
+        paragraph = document.createElement('p');
+        paragraph.innerText = 'No Date';
+        date = document.createElement('input');
+        date.setAttribute('type', 'date');
+        date.setAttribute('name', 'taskDueDate');
+        date.setAttribute('id', 'task-dueDate');
+        date.setAttribute('data-active', 'false');
+    } else {
+        date = document.createElement('input');
+        date.setAttribute('type', 'date');
+        date.setAttribute('name', 'taskDueDate');
+        date.setAttribute('id', 'task-dueDate');
+        date.setAttribute('data-active', 'true');
+        date.setAttribute('value', `${task.dueDate}`);
+    }
+    date.addEventListener('change', () => {
+        task.dueDate = date.value;
+        storage.saveList(toDoList);
+    })
+    newTask.innerHTML = `
+        <input type="checkbox" name="completed" id="task-check-${task.name}"/>
+        <label for="task-check-${task.name}">
+            <span class="custom-checkbox"></span>
+            ${task.name}
+        </label>`;
+    if (paragraph) {
+        newTask.appendChild(paragraph);
+        newTask.appendChild(date);
+        rightWidth = -40 - 20;
+    } else {
+        newTask.appendChild(date);
+        rightWidth = -100 - 20;
+    }
+    if (paragraph) {
+        paragraph.addEventListener('click', (e) => {
+            e.stopPropagation();
+            paragraph.style.display = 'none';
+            date.setAttribute('data-active', 'true');
+            rightWidth = -100 - 20;
+            newTask.setAttribute('style', `--right: ${rightWidth}px`);
+        })
+    }
+    newTask.setAttribute('style', `--right: ${rightWidth}px`);
+    let checkbox = newTask.querySelector('input');
+    if (checked) checkbox.setAttribute('checked', checked);
+    checkbox.addEventListener('change', () => {
+        task.checked = checkbox.checked;
+        storage.saveList(toDoList);
+        let count = project.tasks.filter(task => task.checked === true).length;
+        let clearBtn = document.querySelector('.clear-tasks');
+        if (count > 0) {
+            let titleContainer = document.querySelector('.title-container');
+            if (!clearBtn)
+                titleContainer.innerHTML += `
+                <button class="clear-tasks">
+                    Clear tasks
+                    <i class="fa-sharp fa-solid fa-xmark"></i>
+                </button>`;
+            clearBtn = document.querySelector('.clear-tasks');
+            if (clearBtn)
+            clearBtn.addEventListener('click', () => {
+                    project.removeCheckedTasks();
+                    storage.saveList(toDoList);
+                    generateRightPageDynamic(document.querySelector(`[data-project-id="${project.id}"]`), project);
+            })
+        } else {
+            if (clearBtn)
+                clearBtn.remove();
+        }
+    });
+    
+    let tasksStorage = rightPart.querySelector('.tasks-storage');
+    tasksStorage.appendChild(newTask);
+}
+
 function loadProjects() {
     let highPriorityProjects = organizeSection(1);
     let middlePriorityProjects = organizeSection(2);
@@ -95,6 +191,7 @@ function loadProjects() {
 }
 
 loadPage();
+generateRightPageDynamic(document.querySelector('[data-project-id="1"]'), toDoList.projects[0]);
 
 function alreadyAppended(project) {
     let check = document.querySelector(`[data-project-id='${project.id}']`);
@@ -152,11 +249,52 @@ function appendProjectSection(priorityArray, priority) {
 
 function generateRightPageDynamic(projectElem, project) {
     let projectName = projectElem.querySelector('div').innerText;
+    let width = rightPart.clientWidth - 60;
+    let count = project.tasks.filter(task => task.checked === true).length;
+        if (count !== 0 && count !== undefined) {
+            rightPart.innerHTML = `
+            <div class="title-container">
+                <div class="section-title">${projectName}</div>
+                <button class="clear-tasks">
+                    Clear tasks
+                    <i class="fa-sharp fa-solid fa-xmark"></i>
+                </button>
+            </div>`;
+        } else {
+            rightPart.innerHTML = `
+            <div class="title-container">
+                <div class="section-title">${projectName}</div>
+            </div>`;
+    }
     if (project.id === 1) {
-        rightPart.innerHTML = `<div class=\"section-title\">${projectName}</div><button class=\"add\" data-active=\"true\"><i class=\"fa-solid fa-plus\"></i><div>Add Task</div></button><div class=\"new-task\"><input type=\"text\" /><button class=\"add-task\">Add</button><button class=\"cancel-task\">Cancel</button></div>`;
+        rightPart.innerHTML +=`
+        <div class="tasks-storage"></div>
+        <button class="add" data-active="true">
+            <i class="fa-solid fa-plus"></i>
+            <div>Add Task</div>
+        </button>
+        <div class="new-task">
+            <input type="text" />
+            <button class="add-task">Add</button>
+            <button class="cancel-task">Cancel</button>
+        </div>`;
+        let tasksWithDate = project.tasks.filter(task => {
+            return task.dueDate !== "No date";
+        })
+        tasksWithDate.sort((a, b) => {
+            return compareAsc(parseISO(a.dueDate), parseISO(b.dueDate));
+        })
+        if (tasksWithDate.length !== 0)
+            tasksWithDate.forEach(task => {appendTask(task, project)});
+
+        
+        let tasksWithNoDate = project.tasks.filter(task => {
+            return task.dueDate === "No date";
+        })
+        if (tasksWithNoDate.length !== 0)
+            tasksWithNoDate.forEach(task => {appendTask(task, project)});
     } else {
-        let width = rightPart.clientWidth - 50;
-        rightPart.innerHTML = `<div class="section-title">${projectName}</div>
+        rightPart.innerHTML += `
         <div class="project-description" style="width:${width}px">
           ${project.description}
         </div>
@@ -169,6 +307,7 @@ function generateRightPageDynamic(projectElem, project) {
           <div class="middle pr" data-priority="2"></div>
           <div class="low pr" data-priority="3"></div>
         </div>
+        <div class="tasks-storage"></div>
         <button class="add" data-active="true">
           <i class="fa-solid fa-plus"></i>
           <div>Add Task</div>
@@ -176,7 +315,23 @@ function generateRightPageDynamic(projectElem, project) {
         <div class="new-task">
           <input type="text" /><button class="add-task">Add</button
           ><button class="cancel-task">Cancel</button>
-        </div>`
+        </div>`;
+
+        let tasksWithDate = project.tasks.filter(task => {
+            return task.dueDate !== "No date";
+        })
+        tasksWithDate.sort((a, b) => {
+            return compareAsc(parseISO(a.dueDate), parseISO(b.dueDate));
+        })
+        if (tasksWithDate.length !== 0)
+            tasksWithDate.forEach(task => {appendTask(task, project)});
+
+        
+        let tasksWithNoDate = project.tasks.filter(task => {
+            return task.dueDate === "No date";
+        })
+        if (tasksWithNoDate.length !== 0)
+            tasksWithNoDate.forEach(task => {appendTask(task, project)});
 
 
         let priorityElem = document.querySelector('.prj-priority');
@@ -210,7 +365,15 @@ function generateRightPageDynamic(projectElem, project) {
             loadPage();
         })
     }
-    setNewTaskListeners();
+
+    let clearTasksBtn = document.querySelector('.clear-tasks');
+    if (clearTasksBtn)
+    clearTasksBtn.addEventListener('click', () => {
+            project.removeCheckedTasks();
+            storage.saveList(toDoList);
+            generateRightPageDynamic(document.querySelector(`[data-project-id="${project.id}"]`), project);
+        })
+    setNewTaskListeners(project);
     toDoList.projects.forEach(nonActiveProject => {
         nonActiveProject.active = false;
         let prElem = document.querySelector(`[data-project-id='${nonActiveProject.id}']`);

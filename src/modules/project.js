@@ -12,5 +12,13 @@ export default class Project {
     isDynamic() {
         let staticProjects = ['Today', 'This week'];
         return !staticProjects.includes(this.name);
-    } 
+    }
+    
+    addTask(task) {
+        this.tasks.push(task);
+    }
+
+    removeCheckedTasks() {
+        this.tasks = this.tasks.filter(task => task.checked === false);
+    }
 }
