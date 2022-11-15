@@ -3,7 +3,7 @@ import Task from './modules/task.js';
 import List from './modules/list.js';
 import Project from './modules/project.js';
 import Storage from './modules/storage.js';
-import { compareAsc, parseISO } from 'date-fns';
+import { compareAsc, parseISO, differenceInCalendarDays } from 'date-fns';
 
 const toggleBtn = document.querySelector('header button');
 const addNewProject = document.querySelector('.projects .add');
@@ -164,7 +164,7 @@ function appendTask(task, project) {
                     <i class="fa-sharp fa-solid fa-xmark"></i>
                 </button>`;
             clearBtn = document.querySelector('.clear-tasks');
-            if (clearBtn)
+            if (clearBtn && project.id !== 2 && project.id !== 3)
             clearBtn.addEventListener('click', () => {
                     project.removeCheckedTasks();
                     storage.saveList(toDoList);
@@ -385,7 +385,47 @@ function generateRightPageDynamic(projectElem, project) {
 }
 
 function generateRightPageStatic(projectElem, project) {
-    rightPart.innerHTML = `<div class="section-title">${project.name}</div>`;
+    let tasks = [];
+    let today = new Date();
+    if (project.id === 2) {
+        toDoList.projects.forEach(proj => {
+            proj.tasks.forEach(tsk => {
+                let difference = differenceInCalendarDays(parseISO(tsk.dueDate), today);
+                if (difference <= 1 && difference >= 0)
+                    tasks.push(tsk);
+            })
+        })
+    } else {
+        toDoList.projects.forEach(proj => {
+            proj.tasks.forEach(tsk => {
+                let difference = differenceInCalendarDays(parseISO(tsk.dueDate), today);
+                if (difference <= 7 && difference >= 0)
+                    tasks.push(tsk);
+            })
+        })
+    }
+    rightPart.innerHTML =`
+        <div class="title-container">
+            <div class="section-title">${project.name}</div>
+        </div>
+        <div class="tasks-storage"></div>`;
+    let tasksWithDate = tasks.filter(task => {
+        return task.dueDate !== "No date";
+    })
+    tasksWithDate.sort((a, b) => {
+        return compareAsc(parseISO(a.dueDate), parseISO(b.dueDate));
+    })
+    if (tasksWithDate.length !== 0)
+        tasksWithDate.forEach(task => {appendTask(task, project)});
+
+
+    let tasksWithNoDate = tasks.filter(task => {
+        return task.dueDate === "No date";
+    })
+    if (tasksWithNoDate.length !== 0)
+        tasksWithNoDate.forEach(task => {appendTask(task, project)});
+
+
     toDoList.projects.forEach(nonActiveProject => {
         nonActiveProject.active = false;
         let prElem = document.querySelector(`[data-project-id='${nonActiveProject.id}']`);
